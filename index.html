@@ -3,358 +3,239 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vibe Lounge Enigma Slots & ASM Decoder | DevFest 2026</title>
+  <title>Vibe Lounge Enigma Automat 777 | DevFest 2026</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@300;400;600;700&family=Special+Elite&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;600;700&family=Special+Elite&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
-<body class="mode-casino">
-  <div class="app-container">
+<body>
+  <div class="casino-stage">
     
-    <!-- Top Bar -->
-    <header class="header">
-      <div class="branding">
-        <h1 class="logo-title">🎰 ENIGMA SLOTS 777 <span class="logo-accent">// VIBE CASINO</span></h1>
-        <div class="badge-gemini">
-          Built with <span class="gemini-txt">Gemini</span> &amp; <span class="agy-txt"><span class="agy-icon">▲</span> Antigravity</span>
-          <span class="badge-tag">100% UNIVERSAL ENIGMA I + ASM ENGINE</span>
+    <!-- Top Casino Header -->
+    <header class="casino-header">
+      <div class="brand">
+        <h1 class="casino-title">🎰 ENIGMA AUTOMAT 777 <span class="title-sub">// VIBE LOUNGE</span></h1>
+        <div class="brand-credits">
+          DevFest Prague 2026 &bull; Powered by <span class="hl-gemini">Gemini</span> &amp; <span class="hl-agy">Antigravity</span>
         </div>
       </div>
 
-      <div class="header-status">
-        <!-- Mode Switcher -->
-        <div class="mode-switcher">
-          <button id="btn-mode-casino" class="mode-tab active">🎰 CASINO SLOTS</button>
-          <button id="btn-mode-asm" class="mode-tab">💻 X86-64 ASM</button>
-        </div>
-
-        <div class="live-indicator">
+      <div class="header-tools">
+        <div class="on-air-pill">
           <span class="live-dot"></span>
-          <span class="live-text">ON AIR</span>
+          <span class="live-txt">ON AIR</span>
           <span class="live-clock" id="live-clock">--:--:--</span>
         </div>
-        <button id="sound-toggle" class="btn-sound" title="Toggle sound effects">🔊 SOUND ON</button>
-        <button id="btn-open-submit" class="btn-submit-board">TRANSMIT DECODER</button>
+        <button id="sound-toggle" class="btn-tool">🔊 ZVUK ZAPNUT</button>
       </div>
     </header>
 
-    <!-- Main Grid -->
-    <main class="main-layout">
+    <!-- HERO SECTION: THE CASINO SLOT MACHINE CABINET -->
+    <main class="slot-cabinet">
       
-      <!-- LEFT COLUMN: LIVE RADIO / AGENDA TRANSMISSIONS -->
-      <section class="panel panel-transmissions">
-        <div class="panel-header">
-          <div>
-            <h2 class="panel-title">INTERCEPTED TRANSMISSIONS</h2>
-            <div class="panel-subtitle">Live DevFest agenda broadcast via Enigma I</div>
-          </div>
-          <div class="stream-controls">
-            <span class="sync-timer" id="sync-timer">Syncing in 10s</span>
-            <button id="btn-manual-sync" class="btn-icon" title="Refresh transmissions now">↻</button>
-          </div>
+      <!-- Slot Top Marquee Lights -->
+      <div class="cabinet-marquee">
+        <div class="chaser-lights">
+          <span class="bulb"></span><span class="bulb"></span><span class="bulb"></span>
+          <span class="bulb"></span><span class="bulb"></span><span class="bulb"></span>
+          <span class="bulb"></span><span class="bulb"></span><span class="bulb"></span>
+          <span class="bulb"></span><span class="bulb"></span><span class="bulb"></span>
         </div>
-
-        <div class="transmissions-toolbar">
-          <input type="text" id="agenda-filter" placeholder="Filter talks, speakers, rooms..." class="search-field">
-          <span class="counter-badge" id="transmissions-count">10 intercepted</span>
+        <div class="marquee-title-wrap">
+          <span class="jackpot-flasher">★ 100% RECIPROCAL ENIGMA I CIPHER ★</span>
+          <span class="credits-display">CREDITS: <strong id="credits-num">777</strong> &bull; JACKPOT READY</span>
         </div>
+      </div>
 
-        <div class="transmissions-feed" id="transmissions-feed">
-          <div class="feed-loading">Tuning radio frequency...</div>
-        </div>
-      </section>
-
-      <!-- RIGHT COLUMN: SLOT MACHINE ENIGMA HARDWARE & STUDIO -->
-      <section class="panel panel-hardware slot-machine-chassis">
+      <!-- Center Stage: The 3 Big Spinning Reels + Physical Lever -->
+      <div class="reels-and-lever-stage">
         
-        <!-- Slot Machine Marquee -->
-        <div class="slot-marquee">
-          <div class="marquee-lights">
-            <span class="m-light"></span><span class="m-light"></span><span class="m-light"></span>
-            <span class="m-light"></span><span class="m-light"></span><span class="m-light"></span>
-            <span class="m-light"></span><span class="m-light"></span><span class="m-light"></span>
-          </div>
-          <div class="jackpot-banner">
-            <span class="jackpot-label">JACKPOT AGENDA CRACKER</span>
-            <span class="jackpot-counter">CREDITS: 777 &bull; DECODER ACTIVE</span>
-          </div>
-        </div>
-
-        <!-- Slot Reels + Mechanical Arm Assembly -->
-        <div class="slot-reels-container">
-          
-          <!-- 3 Physical Reels -->
-          <div class="reels-frame">
+        <div class="slot-glass-frame">
+          <div class="reels-row">
             
-            <!-- Reel 1 (Rotor I) -->
-            <div class="reel-box" id="reel-box-0">
-              <div class="reel-header">
-                <span class="reel-id">REEL I (ROTOR I)</span>
-                <span class="reel-notch">NOTCH: Q</span>
+            <!-- Reel 1: Rotor I -->
+            <div class="reel-unit" id="reel-unit-0">
+              <div class="reel-tag">
+                <span class="reel-name">VÁLEC I</span>
+                <span class="reel-sub">Notch: Q</span>
               </div>
-              <div class="reel-window">
+              <div class="reel-viewport">
                 <div class="reel-strip" id="reel-strip-0">
-                  <div class="reel-symbol" id="reel-sym-0">🍉</div>
-                  <div class="reel-letter" id="rotor-val-0">A</div>
+                  <div class="reel-symbol" id="reel-sym-0">🍒</div>
+                  <div class="reel-char" id="rotor-val-0">A</div>
                 </div>
               </div>
-              <div class="reel-controls">
-                <button class="reel-step-btn" data-action="up" data-rotor="0">▲</button>
-                <button class="reel-step-btn" data-action="down" data-rotor="0">▼</button>
+              <div class="reel-adjusters">
+                <button class="btn-reel-step" data-action="up" data-rotor="0" title="Krok nahoru">▲</button>
+                <button class="btn-reel-step" data-action="down" data-rotor="0" title="Krok dolů">▼</button>
               </div>
             </div>
 
-            <!-- Reel 2 (Rotor II) -->
-            <div class="reel-box" id="reel-box-1">
-              <div class="reel-header">
-                <span class="reel-id">REEL II (ROTOR II)</span>
-                <span class="reel-notch">DOUBLE-STEP: E</span>
+            <!-- Reel 2: Rotor II -->
+            <div class="reel-unit" id="reel-unit-1">
+              <div class="reel-tag">
+                <span class="reel-name">VÁLEC II</span>
+                <span class="reel-sub">Double-step: E</span>
               </div>
-              <div class="reel-window">
+              <div class="reel-viewport">
                 <div class="reel-strip" id="reel-strip-1">
-                  <div class="reel-symbol" id="reel-sym-1">💰</div>
-                  <div class="reel-letter" id="rotor-val-1">A</div>
+                  <div class="reel-symbol" id="reel-sym-1">🔔</div>
+                  <div class="reel-char" id="rotor-val-1">A</div>
                 </div>
               </div>
-              <div class="reel-controls">
-                <button class="reel-step-btn" data-action="up" data-rotor="1">▲</button>
-                <button class="reel-step-btn" data-action="down" data-rotor="1">▼</button>
+              <div class="reel-adjusters">
+                <button class="btn-reel-step" data-action="up" data-rotor="1" title="Krok nahoru">▲</button>
+                <button class="btn-reel-step" data-action="down" data-rotor="1" title="Krok dolů">▼</button>
               </div>
             </div>
 
-            <!-- Reel 3 (Rotor III) -->
-            <div class="reel-box" id="reel-box-2">
-              <div class="reel-header">
-                <span class="reel-id">REEL III (ROTOR III)</span>
-                <span class="reel-notch">NOTCH: V</span>
+            <!-- Reel 3: Rotor III -->
+            <div class="reel-unit" id="reel-unit-2">
+              <div class="reel-tag">
+                <span class="reel-name">VÁLEC III</span>
+                <span class="reel-sub">Notch: V</span>
               </div>
-              <div class="reel-window">
+              <div class="reel-viewport">
                 <div class="reel-strip" id="reel-strip-2">
-                  <div class="reel-symbol" id="reel-sym-2">🪙</div>
-                  <div class="reel-letter" id="rotor-val-2">A</div>
+                  <div class="reel-symbol" id="reel-sym-2">💰</div>
+                  <div class="reel-char" id="rotor-val-2">A</div>
                 </div>
               </div>
-              <div class="reel-controls">
-                <button class="reel-step-btn" data-action="up" data-rotor="2">▲</button>
-                <button class="reel-step-btn" data-action="down" data-rotor="2">▼</button>
+              <div class="reel-adjusters">
+                <button class="btn-reel-step" data-action="up" data-rotor="2" title="Krok nahoru">▲</button>
+                <button class="btn-reel-step" data-action="down" data-rotor="2" title="Krok dolů">▼</button>
               </div>
             </div>
 
           </div>
 
-          <!-- The Slot Machine Lever (One-Armed Bandit Handle) -->
-          <div class="slot-lever-assembly" id="slot-lever-assembly" title="CLICK TO PULL LEVER AND SPIN!">
-            <div class="lever-mount"></div>
-            <div class="lever-shaft" id="lever-shaft">
-              <div class="lever-knob"></div>
-            </div>
-            <div class="lever-caption">PULL LEVER</div>
-          </div>
-
-        </div>
-
-        <!-- Spin Action Bar -->
-        <div class="spin-action-bar">
-          <button id="btn-spin-slots" class="btn-spin-jackpot">🎰 SPIN &amp; DECODE (PULL ARM)</button>
-          <div class="slot-presets">
-            <button class="btn-preset active" data-preset="AAA">START: AAA</button>
-            <button class="btn-preset" data-preset="OKP">START: OKP (#6183)</button>
+          <!-- Machine Hardware Badges -->
+          <div class="hardware-badges-row">
+            <span class="hw-chip">REFLEKTOR: <strong>UKW-B</strong></span>
+            <span class="hw-chip">KROK: <strong>DOUBLE-STEPPING</strong></span>
+            <span class="hw-chip">PLUGBOARD: <strong id="plug-display">DE VF ST</strong></span>
           </div>
         </div>
 
-        <!-- X86-64 ASSEMBLY DEBUGGER PANEL (Toggleable) -->
-        <div class="hardware-block asm-panel" id="asm-panel" style="display: none;">
-          <div class="block-title-row">
-            <span class="block-label">💻 X86-64 CPU REGISTER DUMP &amp; DISASSEMBLY</span>
-            <span class="asm-badge">ARCH: AMD64 / SYSTEM V ABI</span>
+        <!-- The Giant Mechanical Pull Lever (One-Armed Bandit) -->
+        <div class="lever-mount-col">
+          <div class="lever-arm-wrap" id="slot-lever-assembly" title="Zatáhni za páku a roztoč automaty!">
+            <div class="lever-socket"></div>
+            <div class="lever-stem" id="lever-stem">
+              <div class="lever-ball"></div>
+            </div>
           </div>
-          <div class="asm-registers" id="asm-registers">
-            <span class="reg">RAX: 0x00000041</span>
-            <span class="reg">RBX: 0x00000010</span>
-            <span class="reg">RCX: 0x00000000</span>
-            <span class="reg">RDX: 0x00000020</span>
-            <span class="reg">R12: [ROTOR POS]</span>
-            <span class="reg">FLAGS: [CF=0, ZF=0, SF=0]</span>
-          </div>
-          <pre class="asm-code-view" id="asm-code-view">;; Click any key or transmission to watch live assembly execution...</pre>
+          <div class="lever-label">ZATÁHNOUT ZA PÁKU</div>
         </div>
 
-        <!-- Lampboard (Glühlampenfeld) -->
-        <div class="hardware-block lampboard-block">
-          <span class="block-label">ILLUMINATED CASINO LAMPBOARD (GLÜHLAMPENFELD)</span>
-          <div class="lampboard" id="lampboard">
-            <div class="key-row">
-              <div class="lamp" data-char="Q">Q</div>
-              <div class="lamp" data-char="W">W</div>
-              <div class="lamp" data-char="E">E</div>
-              <div class="lamp" data-char="R">R</div>
-              <div class="lamp" data-char="T">T</div>
-              <div class="lamp" data-char="Z">Z</div>
-              <div class="lamp" data-char="U">U</div>
-              <div class="lamp" data-char="I">I</div>
-              <div class="lamp" data-char="O">O</div>
-            </div>
-            <div class="key-row">
-              <div class="lamp" data-char="A">A</div>
-              <div class="lamp" data-char="S">S</div>
-              <div class="lamp" data-char="D">D</div>
-              <div class="lamp" data-char="F">F</div>
-              <div class="lamp" data-char="G">G</div>
-              <div class="lamp" data-char="H">H</div>
-              <div class="lamp" data-char="J">J</div>
-              <div class="lamp" data-char="K">K</div>
-            </div>
-            <div class="key-row">
-              <div class="lamp" data-char="P">P</div>
-              <div class="lamp" data-char="Y">Y</div>
-              <div class="lamp" data-char="X">X</div>
-              <div class="lamp" data-char="C">C</div>
-              <div class="lamp" data-char="V">V</div>
-              <div class="lamp" data-char="B">B</div>
-              <div class="lamp" data-char="N">N</div>
-              <div class="lamp" data-char="M">M</div>
-              <div class="lamp" data-char="L">L</div>
-            </div>
+      </div>
+
+      <!-- MAIN ACTION BAR: BIG SPIN BUTTON + PRESETS -->
+      <div class="spin-controls-bar">
+        <button id="btn-spin-slots" class="btn-mega-spin">
+          🎰 ZATOČIT AUTOMAT &amp; ROZLUŠTIT
+        </button>
+        <div class="preset-buttons">
+          <button class="btn-preset active" data-preset="AAA">Reset na AAA</button>
+          <button class="btn-preset" data-preset="OKP">N° 6183 [OKP]</button>
+          <button class="btn-preset" data-preset="RAND">Náhodná točka 🎲</button>
+        </div>
+      </div>
+
+      <!-- INTERACTIVE CIPHER PAYOUT CONSOLE -->
+      <div class="payout-console">
+        <div class="console-box">
+          <label for="studio-input" class="console-label">Vložit jakýkoliv text k zašifrování / rozluštění:</label>
+          <div class="input-row">
+            <input type="text" id="studio-input" placeholder="Zadej text nebo klikni níže na zachycenou zprávu..." value="12:50 GXXOJ QSI: RQHB D AIVCWSYR: DXUUQ JUYU HHC GTXNE ZMOEVI LQ 100 FPREOMQ / BMNISB WTKHB">
+            <button id="btn-run-studio" class="btn-crack">ROZLUŠTIT</button>
           </div>
         </div>
 
-        <!-- Keyboard (Tastatur) -->
-        <div class="hardware-block keyboard-block">
-          <span class="block-label">KEYBOARD (CLICK OR TYPE ANYWHERE)</span>
-          <div class="keyboard" id="keyboard">
-            <div class="key-row">
-              <button class="key" data-char="Q">Q</button>
-              <button class="key" data-char="W">W</button>
-              <button class="key" data-char="E">E</button>
-              <button class="key" data-char="R">R</button>
-              <button class="key" data-char="T">T</button>
-              <button class="key" data-char="Z">Z</button>
-              <button class="key" data-char="U">U</button>
-              <button class="key" data-char="I">I</button>
-              <button class="key" data-char="O">O</button>
-            </div>
-            <div class="key-row">
-              <button class="key" data-char="A">A</button>
-              <button class="key" data-char="S">S</button>
-              <button class="key" data-char="D">D</button>
-              <button class="key" data-char="F">F</button>
-              <button class="key" data-char="G">G</button>
-              <button class="key" data-char="H">H</button>
-              <button class="key" data-char="J">J</button>
-              <button class="key" data-char="K">K</button>
-            </div>
-            <div class="key-row">
-              <button class="key" data-char="P">P</button>
-              <button class="key" data-char="Y">Y</button>
-              <button class="key" data-char="X">X</button>
-              <button class="key" data-char="C">C</button>
-              <button class="key" data-char="V">V</button>
-              <button class="key" data-char="B">B</button>
-              <button class="key" data-char="N">N</button>
-              <button class="key" data-char="M">M</button>
-              <button class="key" data-char="L">L</button>
-            </div>
+        <!-- Winning Ticket / Output Tape -->
+        <div class="winning-tape">
+          <div class="tape-header">
+            <span>VÝHERNÍ PÁSKA // RECIPROČNÍ VÝSTUP ENIGMY:</span>
+            <button id="btn-copy-output" class="btn-mini-action">Kopírovat</button>
+          </div>
+          <div class="tape-body" id="studio-output">
+            Stiskni "ZATOČIT" nebo piš na klávesnici...
+          </div>
+        </div>
+      </div>
+
+      <!-- Electrical Signal Trace -->
+      <div class="trace-strip" id="trace-display">
+        <span class="t-node t-in">VSTUP: -</span> &rarr;
+        <span class="t-node">STECKER: -</span> &rarr;
+        <span class="t-node">VÁLEC III: -</span> &rarr;
+        <span class="t-node">VÁLEC II: -</span> &rarr;
+        <span class="t-node">VÁLEC I: -</span> &rarr;
+        <span class="t-node t-ref">UKW-B: -</span> &rarr;
+        <span class="t-node">VÁLEC I: -</span> &rarr;
+        <span class="t-node">VÁLEC II: -</span> &rarr;
+        <span class="t-node">VÁLEC III: -</span> &rarr;
+        <span class="t-node">STECKER: -</span> &rarr;
+        <span class="t-node t-out">ŽÁROVKA: -</span>
+      </div>
+
+      <!-- Illuminated Lampboard & Keyboard Console -->
+      <div class="cabinet-keyboard-shelf">
+        
+        <!-- Glowing Lamps -->
+        <div class="lampboard-tray" id="lampboard">
+          <div class="key-row">
+            <div class="lamp" data-char="Q">Q</div><div class="lamp" data-char="W">W</div><div class="lamp" data-char="E">E</div><div class="lamp" data-char="R">R</div><div class="lamp" data-char="T">T</div><div class="lamp" data-char="Z">Z</div><div class="lamp" data-char="U">U</div><div class="lamp" data-char="I">I</div><div class="lamp" data-char="O">O</div>
+          </div>
+          <div class="key-row">
+            <div class="lamp" data-char="A">A</div><div class="lamp" data-char="S">S</div><div class="lamp" data-char="D">D</div><div class="lamp" data-char="F">F</div><div class="lamp" data-char="G">G</div><div class="lamp" data-char="H">H</div><div class="lamp" data-char="J">J</div><div class="lamp" data-char="K">K</div>
+          </div>
+          <div class="key-row">
+            <div class="lamp" data-char="P">P</div><div class="lamp" data-char="Y">Y</div><div class="lamp" data-char="X">X</div><div class="lamp" data-char="C">C</div><div class="lamp" data-char="V">V</div><div class="lamp" data-char="B">B</div><div class="lamp" data-char="N">N</div><div class="lamp" data-char="M">M</div><div class="lamp" data-char="L">L</div>
           </div>
         </div>
 
-        <!-- Signal Path Visualizer -->
-        <div class="hardware-block trace-block">
-          <span class="block-label">ELECTRICAL SIGNAL PATH TRACE</span>
-          <div class="trace-display" id="trace-display">
-            <span class="trace-step trace-in">IN: -</span> &rarr;
-            <span class="trace-step">STECK: -</span> &rarr;
-            <span class="trace-step">R3: -</span> &rarr;
-            <span class="trace-step">R2: -</span> &rarr;
-            <span class="trace-step">R1: -</span> &rarr;
-            <span class="trace-step trace-reflector">UKW: -</span> &rarr;
-            <span class="trace-step">R1: -</span> &rarr;
-            <span class="trace-step">R2: -</span> &rarr;
-            <span class="trace-step">R3: -</span> &rarr;
-            <span class="trace-step">STECK: -</span> &rarr;
-            <span class="trace-step trace-out">LAMP: -</span>
+        <!-- Mechanical Keys -->
+        <div class="keys-tray" id="keyboard">
+          <div class="key-row">
+            <button class="key" data-char="Q">Q</button><button class="key" data-char="W">W</button><button class="key" data-char="E">E</button><button class="key" data-char="R">R</button><button class="key" data-char="T">T</button><button class="key" data-char="Z">Z</button><button class="key" data-char="U">U</button><button class="key" data-char="I">I</button><button class="key" data-char="O">O</button>
+          </div>
+          <div class="key-row">
+            <button class="key" data-char="A">A</button><button class="key" data-char="S">S</button><button class="key" data-char="D">D</button><button class="key" data-char="F">F</button><button class="key" data-char="G">G</button><button class="key" data-char="H">H</button><button class="key" data-char="J">J</button><button class="key" data-char="K">K</button>
+          </div>
+          <div class="key-row">
+            <button class="key" data-char="P">P</button><button class="key" data-char="Y">Y</button><button class="key" data-char="X">X</button><button class="key" data-char="C">C</button><button class="key" data-char="V">V</button><button class="key" data-char="B">B</button><button class="key" data-char="N">N</button><button class="key" data-char="M">M</button><button class="key" data-char="L">L</button>
           </div>
         </div>
 
-        <!-- Batch Studio Translator -->
-        <div class="hardware-block studio-block">
-          <div class="block-title-row">
-            <span class="block-label">UNIVERSAL ENCODER / DECODER (ANY TEXT)</span>
-            <div class="studio-actions">
-              <button id="btn-run-studio" class="btn-action">RUN RECIPROCAL ENIGMA</button>
-              <button id="btn-clear-studio" class="btn-ghost">CLEAR</button>
-            </div>
-          </div>
-          <div class="studio-inputs">
-            <div class="input-group">
-              <label for="studio-input">Input (Ciphertext or Plaintext):</label>
-              <textarea id="studio-input" rows="3" placeholder="Type or paste any text..."></textarea>
-            </div>
-            <div class="input-group">
-              <label for="studio-output">Machine Output (100% Reciprocal):</label>
-              <textarea id="studio-output" rows="3" readonly placeholder="Output will appear here..."></textarea>
-            </div>
-          </div>
-        </div>
+      </div>
 
-        <!-- Plugboard (Steckerbrett) -->
-        <div class="hardware-block plugboard-block">
-          <div class="block-title-row">
-            <span class="block-label">PLUGBOARD (STECKERBRETT)</span>
-            <span class="plug-hint">DevFest default: DE VF ST</span>
-          </div>
-          <div class="plugboard-editor">
-            <div class="active-plugs" id="active-plugs">
-              <span class="plug-tag">D &harr; E</span>
-              <span class="plug-tag">V &harr; F</span>
-              <span class="plug-tag">S &harr; T</span>
-            </div>
-            <div class="plug-inputs">
-              <input type="text" id="plug-input-pairs" value="DE VF ST" placeholder="Pairs (e.g. DE VF ST)">
-              <button id="btn-update-plugs" class="btn-ghost">UPDATE PLUGS</button>
-            </div>
-          </div>
-        </div>
-
-      </section>
     </main>
 
-    <!-- Modal: Submit Decoder to DevFest Board -->
-    <div class="modal-backdrop" id="submit-modal" style="display: none;">
-      <div class="modal paper">
-        <button class="modal-close" id="btn-close-modal">&times;</button>
-        <p class="kicker">DevFest Prague 2026 // Vibe Lounge</p>
-        <h2 class="modal-title">SUBMIT YOUR DECODER</h2>
-        <p class="modal-desc">
-          Put your decoder on the live lounge screen. The three best decoders win developer tool licenses!
-        </p>
-
-        <form id="leaderboard-form" class="modal-form">
-          <label class="form-label" for="submit-team">Team or Agent Name</label>
-          <input type="text" id="submit-team" name="team" required maxlength="40" value="Lukáš Trkan &amp; Antigravity" class="form-field">
-
-          <label class="form-label" for="submit-url">Deployed URL (Public https://)</label>
-          <input type="url" id="submit-url" name="url" required maxlength="200" value="https://lukastrkan.github.io/vibe-enigma/" class="form-field">
-
-          <p class="form-note">Must be a public HTTPS URL accessible from the venue screen.</p>
-
-          <div class="modal-actions">
-            <button type="submit" id="btn-transmit-entry" class="btn-transmit">TRANSMIT TO BOARD</button>
-          </div>
-          <p class="submit-feedback" id="submit-feedback" role="status"></p>
-        </form>
+    <!-- SECONDARY DRAWER: LIVE RADIO BROADCASTS (TICKER) -->
+    <section class="live-transmissions-drawer">
+      <div class="drawer-header">
+        <div class="drawer-title-wrap">
+          <span class="drawer-title">📻 ODPOSLECHNUTÁ ŽIVÁ VYSÍLÁNÍ (DEVFEST AGENDA)</span>
+          <span class="drawer-sub">Kliknutím na zprávu ji automaticky načteš do automatu a roztočíš válce!</span>
+        </div>
+        <div class="drawer-controls">
+          <span class="sync-status" id="sync-timer">Další za 10s</span>
+          <button id="btn-manual-sync" class="btn-refresh" title="Obnovit vysílání">↻</button>
+        </div>
       </div>
-    </div>
+
+      <div class="feed-grid" id="transmissions-feed">
+        <div class="feed-loader">Nalaďuji frekvenci...</div>
+      </div>
+    </section>
 
     <!-- Footer -->
-    <footer class="footer">
-      <div class="footer-left">
-        DevFest Prague 2026 &bull; Vibe Lounge &bull; API: <a href="https://devfest-vibe-lounge.web.app/api" target="_blank" rel="noopener">devfest-vibe-lounge.web.app/api</a>
-      </div>
-      <div class="footer-right">
-        Pair-coded live with <strong>Gemini</strong> &amp; <strong>Google Antigravity</strong>
-      </div>
+    <footer class="casino-footer">
+      DevFest Prague 2026 &bull; Vibe Lounge Challenge &bull; Live Board: <a href="https://devfest-vibe-lounge.web.app/" target="_blank" rel="noopener">devfest-vibe-lounge.web.app</a>
     </footer>
+
   </div>
 
   <script type="module" src="app.js"></script>

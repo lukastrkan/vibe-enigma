@@ -1,7 +1,7 @@
 import { EnigmaMachine, CASINO_SYMBOLS } from './enigma.js';
 import { sound } from './audio.js';
 
-// Configuration
+// Machine Configuration
 const API_BASE = 'https://devfest-vibe-lounge.web.app/api';
 let machine = new EnigmaMachine({
   rotors: ['I', 'II', 'III'],
@@ -15,6 +15,7 @@ let transmissionsData = [];
 let nextSyncSeconds = 10;
 let syncTimerInterval = null;
 let isSpinning = false;
+let credits = 777;
 
 // DOM Elements
 const rotorVals = [
@@ -45,37 +46,20 @@ document.querySelectorAll('.key').forEach(el => {
 
 const traceDisplay = document.getElementById('trace-display');
 const transmissionsFeed = document.getElementById('transmissions-feed');
-const transmissionsCount = document.getElementById('transmissions-count');
-const agendaFilter = document.getElementById('agenda-filter');
 const syncTimer = document.getElementById('sync-timer');
 const btnManualSync = document.getElementById('btn-manual-sync');
 const liveClock = document.getElementById('live-clock');
 const soundToggle = document.getElementById('sound-toggle');
+const creditsNum = document.getElementById('credits-num');
 
 const studioInput = document.getElementById('studio-input');
 const studioOutput = document.getElementById('studio-output');
 const btnRunStudio = document.getElementById('btn-run-studio');
-const btnClearStudio = document.getElementById('btn-clear-studio');
+const btnCopyOutput = document.getElementById('btn-copy-output');
 
-const activePlugsEl = document.getElementById('active-plugs');
-const plugInputPairs = document.getElementById('plug-input-pairs');
-const btnUpdatePlugs = document.getElementById('btn-update-plugs');
-
-const submitModal = document.getElementById('submit-modal');
-const btnOpenSubmit = document.getElementById('btn-open-submit');
-const btnCloseModal = document.getElementById('btn-close-modal');
-const leaderboardForm = document.getElementById('leaderboard-form');
-const submitFeedback = document.getElementById('submit-feedback');
-
-// Slot Machine & ASM Elements
 const slotLeverAssembly = document.getElementById('slot-lever-assembly');
-const leverShaft = document.getElementById('lever-shaft');
+const leverStem = document.getElementById('lever-stem');
 const btnSpinSlots = document.getElementById('btn-spin-slots');
-const btnModeCasino = document.getElementById('btn-mode-casino');
-const btnModeAsm = document.getElementById('btn-mode-asm');
-const asmPanel = document.getElementById('asm-panel');
-const asmCodeView = document.getElementById('asm-code-view');
-const asmRegisters = document.getElementById('asm-registers');
 
 // Update UI Rotor & Slot Reel Display
 function updateRotorUI() {
@@ -100,47 +84,28 @@ function flashLamp(char) {
   if (lampTimeout) clearTimeout(lampTimeout);
   lampTimeout = setTimeout(() => {
     lamp.classList.remove('lit');
-  }, 350);
+  }, 320);
 }
 
 // Update Electrical Trace
 function updateTraceUI(trace) {
   if (!trace) return;
   traceDisplay.innerHTML = `
-    <span class="trace-step trace-in">IN: ${trace.raw}</span> &rarr;
-    <span class="trace-step">STECK: ${trace.plugboardIn}</span> &rarr;
-    <span class="trace-step">R3: ${trace.forwardR}</span> &rarr;
-    <span class="trace-step">R2: ${trace.forwardM}</span> &rarr;
-    <span class="trace-step">R1: ${trace.forwardL}</span> &rarr;
-    <span class="trace-step trace-reflector">UKW: ${trace.reflector}</span> &rarr;
-    <span class="trace-step">R1: ${trace.backwardL}</span> &rarr;
-    <span class="trace-step">R2: ${trace.backwardM}</span> &rarr;
-    <span class="trace-step">R3: ${trace.backwardR}</span> &rarr;
-    <span class="trace-step">STECK: ${trace.plugboardOut}</span> &rarr;
-    <span class="trace-step trace-out">LAMP: ${trace.final}</span>
+    <span class="t-node t-in">VSTUP: ${trace.raw}</span> &rarr;
+    <span class="t-node">STECKER: ${trace.plugboardIn}</span> &rarr;
+    <span class="t-node">VÁLEC III: ${trace.forwardR}</span> &rarr;
+    <span class="t-node">VÁLEC II: ${trace.forwardM}</span> &rarr;
+    <span class="t-node">VÁLEC I: ${trace.forwardL}</span> &rarr;
+    <span class="t-node t-ref">UKW-B: ${trace.reflector}</span> &rarr;
+    <span class="t-node">VÁLEC I: ${trace.backwardL}</span> &rarr;
+    <span class="t-node">VÁLEC II: ${trace.backwardM}</span> &rarr;
+    <span class="t-node">VÁLEC III: ${trace.backwardR}</span> &rarr;
+    <span class="t-node">STECKER: ${trace.plugboardOut}</span> &rarr;
+    <span class="t-node t-out">ŽÁROVKA: ${trace.final}</span>
   `;
 }
 
-// Update ASM CPU Registers & View
-function updateAsmUI(res) {
-  if (!res || !res.asm) return;
-  const pos = machine.getPositions();
-  const upper = res.input.toUpperCase();
-  const out = res.output;
-
-  asmRegisters.innerHTML = `
-    <span class="reg">RAX: 0x${out.charCodeAt(0).toString(16).padStart(8, '0')}</span>
-    <span class="reg">RBX: 0x00000010</span>
-    <span class="reg">R12: ['${pos[0]}','${pos[1]}','${pos[2]}']</span>
-    <span class="reg">RSI: &amp;'${upper}'</span>
-    <span class="reg">RDI: &amp;'${out}'</span>
-    <span class="reg">FLAGS: [CF=0, ZF=${out === upper ? 1 : 0}, SF=0]</span>
-  `;
-
-  asmCodeView.textContent = res.asm;
-}
-
-// Handle Single Character Keypress
+// Handle Single Keypress
 function handleCharInput(char) {
   const res = machine.processChar(char);
   sound.playKeyClick();
@@ -148,49 +113,56 @@ function handleCharInput(char) {
     updateRotorUI();
     flashLamp(res.output);
     updateTraceUI(res.trace);
-    updateAsmUI(res);
   }
   return res.output;
 }
 
-// Slot Machine Spin Animation
-async function spinSlotReels(targetPos = null) {
+// Full Mechanical Slot Reel Spin Animation
+function spinSlotReels(targetPos = null, onFinish = null) {
   if (isSpinning) return;
   isSpinning = true;
 
+  // Lever pull sound + animation
   sound.playLeverPull();
-  leverShaft.classList.add('pulled');
-  setTimeout(() => leverShaft.classList.remove('pulled'), 250);
+  if (leverStem) {
+    leverStem.classList.add('pulled');
+    setTimeout(() => leverStem.classList.remove('pulled'), 260);
+  }
 
-  // Start spinning all 3 reels
+  // Deduct/Add Credits
+  credits += 10;
+  if (creditsNum) creditsNum.textContent = credits;
+
+  // Start spinning reels
   reelStrips.forEach(strip => strip.classList.add('spinning'));
 
-  let ticks = 0;
+  let tickCount = 0;
   const tickInterval = setInterval(() => {
     sound.playReelTick(0.8 + Math.random() * 0.4);
-    ticks++;
+    tickCount++;
   }, 70);
 
-  // Stop Reel 1, 2, 3 sequentially
+  // Target rotor letters
   const finalPos = targetPos || [
     String.fromCharCode(65 + Math.floor(Math.random() * 26)),
     String.fromCharCode(65 + Math.floor(Math.random() * 26)),
     String.fromCharCode(65 + Math.floor(Math.random() * 26))
   ].join('');
 
+  // Sequentially stop reels 1, 2, 3
   setTimeout(() => {
     reelStrips[0].classList.remove('spinning');
     sound.playReelStop();
     rotorVals[0].textContent = finalPos[0];
     reelSyms[0].textContent = CASINO_SYMBOLS[finalPos[0]] || '🎰';
-  }, 600);
+  }, 500);
 
   setTimeout(() => {
     reelStrips[1].classList.remove('spinning');
     sound.playReelStop();
     rotorVals[1].textContent = finalPos[1];
     reelSyms[1].textContent = CASINO_SYMBOLS[finalPos[1]] || '🎰';
-  }, 950);
+  }, 850);
 
   setTimeout(() => {
     reelStrips[2].classList.remove('spinning');
@@ -198,10 +170,13 @@ async function spinSlotReels(targetPos = null) {
     sound.playReelStop();
     rotorVals[2].textContent = finalPos[2];
     reelSyms[2].textContent = CASINO_SYMBOLS[finalPos[2]] || '🎰';
+    
     machine.setPositions(finalPos);
     isSpinning = false;
     sound.playJackpot();
-  }, 1300);
+
+    if (onFinish) onFinish(finalPos);
+  }, 1200);
 }
 
 // Parse Agenda String
@@ -224,10 +199,8 @@ function parseAgenda(text) {
   };
 }
 
-// Decode All Transmissions & Render
+// Render Transmissions Feed in the Secondary Drawer
 function renderTransmissions() {
-  const filterQuery = (agendaFilter.value || '').toLowerCase().trim();
-
   const decoder = new EnigmaMachine({
     rotors: machine.rotorNames,
     reflector: machine.reflectorName,
@@ -238,71 +211,40 @@ function renderTransmissions() {
   const cardsHtml = transmissionsData.map((t, idx) => {
     const decodedText = decoder.processText(t.ciphertext, t.start).text;
     const parsed = parseAgenda(decodedText);
-
-    const matches = !filterQuery || 
-      decodedText.toLowerCase().includes(filterQuery) ||
-      t.ciphertext.toLowerCase().includes(filterQuery) ||
-      String(t.number).includes(filterQuery);
-
-    if (!matches) return '';
-
     const sentTime = t.sentAt ? new Date(t.sentAt).toLocaleTimeString() : '';
 
     return `
-      <div class="transmission-card ${idx === 0 ? 'latest' : ''}" data-number="${t.number}">
-        <div class="t-meta-bar">
-          <div class="t-num-wrap">
-            <span class="t-num">N° ${t.number}</span>
-            <span class="t-time">${sentTime}</span>
-          </div>
-          <div class="t-rotors">
-            <span>Rotor start:</span>
-            <span class="rotor-chip">${t.start[0]} ${CASINO_SYMBOLS[t.start[0]] || ''}</span>
-            <span class="rotor-chip">${t.start[1]} ${CASINO_SYMBOLS[t.start[1]] || ''}</span>
-            <span class="rotor-chip">${t.start[2]} ${CASINO_SYMBOLS[t.start[2]] || ''}</span>
-          </div>
+      <div class="feed-item ${idx === 0 ? 'latest' : ''}" data-start="${t.start}" data-cipher="${encodeURIComponent(t.ciphertext)}">
+        <div class="fi-meta">
+          <span class="fi-num">N° ${t.number} (${sentTime})</span>
+          <span class="fi-rotors">[${t.start[0]} ${CASINO_SYMBOLS[t.start[0]] || ''}][${t.start[1]} ${CASINO_SYMBOLS[t.start[1]] || ''}][${t.start[2]} ${CASINO_SYMBOLS[t.start[2]] || ''}]</span>
         </div>
-
-        <div class="t-decoded">
-          <div class="t-tag-row">
-            ${parsed.time ? `<span class="badge-time">${parsed.time}</span>` : ''}
-            ${parsed.room ? `<span class="badge-room">${parsed.room}</span>` : ''}
-          </div>
-          <div class="t-title">${parsed.title}</div>
-          ${parsed.speakers ? `<div class="t-speakers">&bull; ${parsed.speakers}</div>` : ''}
+        <div class="fi-tag-row">
+          ${parsed.time ? `<span class="tag-time">${parsed.time}</span>` : ''}
+          ${parsed.room ? `<span class="tag-room">${parsed.room}</span>` : ''}
         </div>
-
-        <div class="t-cipher-raw">
-          <code>${t.ciphertext}</code>
-          <button class="btn-load-enigma" data-start="${t.start}" data-cipher="${encodeURIComponent(t.ciphertext)}">🎰 Pull &amp; Decode</button>
-        </div>
+        <div class="fi-decoded">${parsed.title}</div>
+        <div class="fi-cta">&larr; Klikni pro roztočení automatu</div>
       </div>
     `;
-  }).filter(Boolean).join('');
+  }).join('');
 
-  transmissionsFeed.innerHTML = cardsHtml || '<div class="feed-empty">No matching transmissions found.</div>';
-  transmissionsCount.textContent = `${transmissionsData.length} intercepted`;
+  transmissionsFeed.innerHTML = cardsHtml || '<div class="feed-empty">Žádné zachycené zprávy.</div>';
 
-  // Attach Load Button listeners
-  document.querySelectorAll('.btn-load-enigma').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const start = btn.dataset.start;
-      const cipher = decodeURIComponent(btn.dataset.cipher);
-
-      // Trigger Casino spin to target start setting!
-      spinSlotReels(start);
+  // Attach click listener: loading into slot machine
+  document.querySelectorAll('.feed-item').forEach(item => {
+    item.addEventListener('click', () => {
+      const start = item.dataset.start;
+      const cipher = decodeURIComponent(item.dataset.cipher);
 
       studioInput.value = cipher;
-      setTimeout(() => {
+      spinSlotReels(start, () => {
         const result = machine.processText(cipher, start);
-        studioOutput.value = result.text;
+        studioOutput.textContent = result.text;
         if (result.traces.length > 0) {
           updateTraceUI(result.traces[result.traces.length - 1]);
         }
-        if (result.asmLogs.length > 0) {
-          asmCodeView.textContent = result.asmLogs[0];
-        }
-      }, 1350);
+      });
     });
   });
 }
@@ -326,7 +268,7 @@ async function fetchTransmissions() {
 function startSyncTimer() {
   if (syncTimerInterval) clearInterval(syncTimerInterval);
   nextSyncSeconds = 10;
-  syncTimer.textContent = `Syncing in ${nextSyncSeconds}s`;
+  if (syncTimer) syncTimer.textContent = `Další za ${nextSyncSeconds}s`;
 
   syncTimerInterval = setInterval(() => {
     nextSyncSeconds--;
@@ -334,18 +276,18 @@ function startSyncTimer() {
       nextSyncSeconds = 10;
       fetchTransmissions();
     }
-    syncTimer.textContent = `Syncing in ${nextSyncSeconds}s`;
+    if (syncTimer) syncTimer.textContent = `Další za ${nextSyncSeconds}s`;
   }, 1000);
 }
 
 // Live Clock
 setInterval(() => {
   const now = new Date();
-  liveClock.textContent = now.toTimeString().split(' ')[0];
+  if (liveClock) liveClock.textContent = now.toTimeString().split(' ')[0];
 }, 1000);
 
-// Setup Reel Stepper Buttons
-document.querySelectorAll('.reel-step-btn').forEach(btn => {
+// Reel Adjuster Buttons (▲ / ▼)
+document.querySelectorAll('.btn-reel-step').forEach(btn => {
   btn.addEventListener('click', () => {
     const rotorIdx = parseInt(btn.dataset.rotor, 10);
     const action = btn.dataset.action;
@@ -366,39 +308,72 @@ document.querySelectorAll('.reel-step-btn').forEach(btn => {
   });
 });
 
-// Setup Presets
+// Slot Presets
 document.querySelectorAll('.btn-preset').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.btn-preset').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     const preset = btn.dataset.preset;
-    spinSlotReels(preset);
+    if (preset === 'RAND') {
+      spinSlotReels();
+    } else {
+      spinSlotReels(preset);
+    }
   });
 });
 
-// Slot Lever Pull Click
-slotLeverAssembly.addEventListener('click', () => {
-  spinSlotReels();
-});
+// Pull Lever Click
+if (slotLeverAssembly) {
+  slotLeverAssembly.addEventListener('click', () => {
+    spinSlotReels(null, () => {
+      // Decode current input on spin finish
+      const text = studioInput.value;
+      if (text) {
+        const result = machine.processText(text);
+        studioOutput.textContent = result.text;
+      }
+    });
+  });
+}
 
-btnSpinSlots.addEventListener('click', () => {
-  spinSlotReels();
-});
+// Spin Button Click
+if (btnSpinSlots) {
+  btnSpinSlots.addEventListener('click', () => {
+    spinSlotReels(null, () => {
+      const text = studioInput.value;
+      if (text) {
+        const result = machine.processText(text);
+        studioOutput.textContent = result.text;
+      }
+    });
+  });
+}
 
-// Mode Switcher Tabs
-btnModeCasino.addEventListener('click', () => {
-  btnModeCasino.classList.add('active');
-  btnModeAsm.classList.remove('active');
-  asmPanel.style.display = 'none';
-});
+// Run Studio Input
+if (btnRunStudio) {
+  btnRunStudio.addEventListener('click', () => {
+    const text = studioInput.value;
+    const result = machine.processText(text);
+    studioOutput.textContent = result.text;
+    updateRotorUI();
+    if (result.traces.length > 0) {
+      updateTraceUI(result.traces[result.traces.length - 1]);
+    }
+    sound.playJackpot();
+  });
+}
 
-btnModeAsm.addEventListener('click', () => {
-  btnModeAsm.classList.add('active');
-  btnModeCasino.classList.remove('active');
-  asmPanel.style.display = 'flex';
-});
+// Copy Output
+if (btnCopyOutput) {
+  btnCopyOutput.addEventListener('click', () => {
+    const text = studioOutput.textContent;
+    navigator.clipboard.writeText(text);
+    btnCopyOutput.textContent = 'Zkopírováno!';
+    setTimeout(() => btnCopyOutput.textContent = 'Kopírovat', 1500);
+  });
+}
 
-// Virtual Keyboard
+// Virtual Keyboard Keys
 document.querySelectorAll('.key').forEach(keyEl => {
   keyEl.addEventListener('click', () => {
     const char = keyEl.dataset.char;
@@ -424,105 +399,22 @@ window.addEventListener('keydown', (e) => {
 });
 
 // Sound Toggle
-soundToggle.addEventListener('click', () => {
-  const isMuted = sound.toggleMute();
-  soundToggle.textContent = isMuted ? '🔇 SOUND OFF' : '🔊 SOUND ON';
-});
+if (soundToggle) {
+  soundToggle.addEventListener('click', () => {
+    const isMuted = sound.toggleMute();
+    soundToggle.textContent = isMuted ? '🔇 ZVUK VYPNUT' : '🔊 ZVUK ZAPNUT';
+  });
+}
 
 // Manual Sync
-btnManualSync.addEventListener('click', () => {
-  fetchTransmissions();
-  startSyncTimer();
-});
+if (btnManualSync) {
+  btnManualSync.addEventListener('click', () => {
+    fetchTransmissions();
+    startSyncTimer();
+  });
+}
 
-// Filter
-agendaFilter.addEventListener('input', () => {
-  renderTransmissions();
-});
-
-// Studio Actions
-btnRunStudio.addEventListener('click', () => {
-  const input = studioInput.value;
-  const res = machine.processText(input);
-  studioOutput.value = res.text;
-  updateRotorUI();
-  if (res.traces.length > 0) {
-    updateTraceUI(res.traces[res.traces.length - 1]);
-  }
-  if (res.asmLogs.length > 0) {
-    asmCodeView.textContent = res.asmLogs[0];
-  }
-  sound.playJackpot();
-});
-
-btnClearStudio.addEventListener('click', () => {
-  studioInput.value = '';
-  studioOutput.value = '';
-});
-
-// Plugboard Editor
-btnUpdatePlugs.addEventListener('click', () => {
-  const raw = plugInputPairs.value.trim().toUpperCase();
-  const pairs = raw.split(/\s+/).filter(p => p.length === 2);
-  machine.setPlugboard(pairs);
-
-  activePlugsEl.innerHTML = pairs.map(p => `
-    <span class="plug-tag">${p[0]} &harr; ${p[1]}</span>
-  `).join('');
-
-  sound.playKeyClick();
-});
-
-// Modal Logic
-btnOpenSubmit.addEventListener('click', () => {
-  submitModal.style.display = 'flex';
-});
-
-btnCloseModal.addEventListener('click', () => {
-  submitModal.style.display = 'none';
-});
-
-submitModal.addEventListener('click', (e) => {
-  if (e.target === submitModal) submitModal.style.display = 'none';
-});
-
-leaderboardForm.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const team = document.getElementById('submit-team').value.trim();
-  const url = document.getElementById('submit-url').value.trim();
-  const btn = document.getElementById('btn-transmit-entry');
-
-  btn.disabled = true;
-  submitFeedback.className = 'submit-feedback';
-  submitFeedback.textContent = 'Transmitting to DevFest board...';
-
-  try {
-    const res = await fetch(`${API_BASE}/entries`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ team, url })
-    });
-
-    if (res.ok) {
-      submitFeedback.className = 'submit-feedback ok';
-      submitFeedback.textContent = '✓ Received! Your decoder is live on the lounge board.';
-      setTimeout(() => {
-        submitModal.style.display = 'none';
-      }, 2500);
-    } else {
-      const data = await res.json().catch(() => ({}));
-      submitFeedback.className = 'submit-feedback err';
-      submitFeedback.textContent = data.error || 'Failed to transmit entry.';
-    }
-  } catch (err) {
-    submitFeedback.className = 'submit-feedback err';
-    submitFeedback.textContent = 'No signal. Could not reach server.';
-  } finally {
-    btn.disabled = false;
-  }
-});
-
-// Initial boot
+// Initial Boot
 updateRotorUI();
 fetchTransmissions();
 startSyncTimer();
