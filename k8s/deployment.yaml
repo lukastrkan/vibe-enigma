@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vibe-enigma-decoder
+  labels:
+    app: vibe-enigma-decoder
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: vibe-enigma-decoder
+  template:
+    metadata:
+      labels:
+        app: vibe-enigma-decoder
+    spec:
+      containers:
+      - name: web
+        image: ghcr.io/lukastrkan/vibe-enigma:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 80
+        resources:
+          limits:
+            cpu: 100m
+            memory: 64Mi
+          requests:
+            cpu: 20m
+            memory: 16Mi
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 3
+          periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vibe-enigma-service
+  labels:
+    app: vibe-enigma-decoder
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: 80
+    protocol: TCP
+    name: http
+  selector:
+    app: vibe-enigma-decoder
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: vibe-enigma-ingress
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  tls:
+  - hosts:
+    - enigma.trkan.cz
+    secretName: vibe-enigma-tls
+  rules:
+  - host: enigma.trkan.cz
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: vibe-enigma-service
+            port:
+              number: 80
