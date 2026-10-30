@@ -3,24 +3,32 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vibe Lounge Enigma Decoder | DevFest 2026</title>
+  <title>Vibe Lounge Enigma Slots & ASM Decoder | DevFest 2026</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@300;400;600;700&family=Special+Elite&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="mode-casino">
   <div class="app-container">
+    
     <!-- Top Bar -->
     <header class="header">
       <div class="branding">
-        <h1 class="logo-title">VIBE LOUNGE <span class="logo-accent">// ENIGMA</span></h1>
+        <h1 class="logo-title">🎰 ENIGMA SLOTS 777 <span class="logo-accent">// VIBE CASINO</span></h1>
         <div class="badge-gemini">
           Built with <span class="gemini-txt">Gemini</span> &amp; <span class="agy-txt"><span class="agy-icon">▲</span> Antigravity</span>
+          <span class="badge-tag">100% UNIVERSAL ENIGMA I + ASM ENGINE</span>
         </div>
       </div>
 
       <div class="header-status">
+        <!-- Mode Switcher -->
+        <div class="mode-switcher">
+          <button id="btn-mode-casino" class="mode-tab active">🎰 CASINO SLOTS</button>
+          <button id="btn-mode-asm" class="mode-tab">💻 X86-64 ASM</button>
+        </div>
+
         <div class="live-indicator">
           <span class="live-dot"></span>
           <span class="live-text">ON AIR</span>
@@ -57,67 +65,125 @@
         </div>
       </section>
 
-      <!-- RIGHT COLUMN: ENIGMA HARDWARE & DECODER STUDIO -->
-      <section class="panel panel-hardware">
+      <!-- RIGHT COLUMN: SLOT MACHINE ENIGMA HARDWARE & STUDIO -->
+      <section class="panel panel-hardware slot-machine-chassis">
         
-        <!-- Enigma Rotor Unit -->
-        <div class="hardware-block rotor-assembly">
+        <!-- Slot Machine Marquee -->
+        <div class="slot-marquee">
+          <div class="marquee-lights">
+            <span class="m-light"></span><span class="m-light"></span><span class="m-light"></span>
+            <span class="m-light"></span><span class="m-light"></span><span class="m-light"></span>
+            <span class="m-light"></span><span class="m-light"></span><span class="m-light"></span>
+          </div>
+          <div class="jackpot-banner">
+            <span class="jackpot-label">JACKPOT AGENDA CRACKER</span>
+            <span class="jackpot-counter">CREDITS: 777 &bull; DECODER ACTIVE</span>
+          </div>
+        </div>
+
+        <!-- Slot Reels + Mechanical Arm Assembly -->
+        <div class="slot-reels-container">
+          
+          <!-- 3 Physical Reels -->
+          <div class="reels-frame">
+            
+            <!-- Reel 1 (Rotor I) -->
+            <div class="reel-box" id="reel-box-0">
+              <div class="reel-header">
+                <span class="reel-id">REEL I (ROTOR I)</span>
+                <span class="reel-notch">NOTCH: Q</span>
+              </div>
+              <div class="reel-window">
+                <div class="reel-strip" id="reel-strip-0">
+                  <div class="reel-symbol" id="reel-sym-0">🍉</div>
+                  <div class="reel-letter" id="rotor-val-0">A</div>
+                </div>
+              </div>
+              <div class="reel-controls">
+                <button class="reel-step-btn" data-action="up" data-rotor="0">▲</button>
+                <button class="reel-step-btn" data-action="down" data-rotor="0">▼</button>
+              </div>
+            </div>
+
+            <!-- Reel 2 (Rotor II) -->
+            <div class="reel-box" id="reel-box-1">
+              <div class="reel-header">
+                <span class="reel-id">REEL II (ROTOR II)</span>
+                <span class="reel-notch">DOUBLE-STEP: E</span>
+              </div>
+              <div class="reel-window">
+                <div class="reel-strip" id="reel-strip-1">
+                  <div class="reel-symbol" id="reel-sym-1">💰</div>
+                  <div class="reel-letter" id="rotor-val-1">A</div>
+                </div>
+              </div>
+              <div class="reel-controls">
+                <button class="reel-step-btn" data-action="up" data-rotor="1">▲</button>
+                <button class="reel-step-btn" data-action="down" data-rotor="1">▼</button>
+              </div>
+            </div>
+
+            <!-- Reel 3 (Rotor III) -->
+            <div class="reel-box" id="reel-box-2">
+              <div class="reel-header">
+                <span class="reel-id">REEL III (ROTOR III)</span>
+                <span class="reel-notch">NOTCH: V</span>
+              </div>
+              <div class="reel-window">
+                <div class="reel-strip" id="reel-strip-2">
+                  <div class="reel-symbol" id="reel-sym-2">🪙</div>
+                  <div class="reel-letter" id="rotor-val-2">A</div>
+                </div>
+              </div>
+              <div class="reel-controls">
+                <button class="reel-step-btn" data-action="up" data-rotor="2">▲</button>
+                <button class="reel-step-btn" data-action="down" data-rotor="2">▼</button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- The Slot Machine Lever (One-Armed Bandit Handle) -->
+          <div class="slot-lever-assembly" id="slot-lever-assembly" title="CLICK TO PULL LEVER AND SPIN!">
+            <div class="lever-mount"></div>
+            <div class="lever-shaft" id="lever-shaft">
+              <div class="lever-knob"></div>
+            </div>
+            <div class="lever-caption">PULL LEVER</div>
+          </div>
+
+        </div>
+
+        <!-- Spin Action Bar -->
+        <div class="spin-action-bar">
+          <button id="btn-spin-slots" class="btn-spin-jackpot">🎰 SPIN &amp; DECODE (PULL ARM)</button>
+          <div class="slot-presets">
+            <button class="btn-preset active" data-preset="AAA">START: AAA</button>
+            <button class="btn-preset" data-preset="OKP">START: OKP (#6183)</button>
+          </div>
+        </div>
+
+        <!-- X86-64 ASSEMBLY DEBUGGER PANEL (Toggleable) -->
+        <div class="hardware-block asm-panel" id="asm-panel" style="display: none;">
           <div class="block-title-row">
-            <span class="block-label">ROTOR SETTINGS (WALZENLAGE &amp; GRUNDSTELLUNG)</span>
-            <div class="rotor-presets">
-              <button class="btn-preset active" data-preset="AAA">Preset AAA</button>
-              <button class="btn-preset" data-preset="OKP">N° 6183 [OKP]</button>
-            </div>
+            <span class="block-label">💻 X86-64 CPU REGISTER DUMP &amp; DISASSEMBLY</span>
+            <span class="asm-badge">ARCH: AMD64 / SYSTEM V ABI</span>
           </div>
-
-          <div class="rotors-display">
-            <!-- Rotor I (Left) -->
-            <div class="rotor-card" data-rotor="0">
-              <span class="rotor-id">ROTOR I</span>
-              <button class="rotor-btn up" data-action="up" data-rotor="0">▲</button>
-              <div class="rotor-window">
-                <span class="rotor-val" id="rotor-val-0">A</span>
-              </div>
-              <button class="rotor-btn down" data-action="down" data-rotor="0">▼</button>
-              <span class="rotor-notch-info">Notch: Q</span>
-            </div>
-
-            <!-- Rotor II (Middle) -->
-            <div class="rotor-card" data-rotor="1">
-              <span class="rotor-id">ROTOR II</span>
-              <button class="rotor-btn up" data-action="up" data-rotor="1">▲</button>
-              <div class="rotor-window">
-                <span class="rotor-val" id="rotor-val-1">A</span>
-              </div>
-              <button class="rotor-btn down" data-action="down" data-rotor="1">▼</button>
-              <span class="rotor-notch-info">Notch: E (Double-step)</span>
-            </div>
-
-            <!-- Rotor III (Right) -->
-            <div class="rotor-card" data-rotor="2">
-              <span class="rotor-id">ROTOR III</span>
-              <button class="rotor-btn up" data-action="up" data-rotor="2">▲</button>
-              <div class="rotor-window">
-                <span class="rotor-val" id="rotor-val-2">A</span>
-              </div>
-              <button class="rotor-btn down" data-action="down" data-rotor="2">▼</button>
-              <span class="rotor-notch-info">Notch: V</span>
-            </div>
-
-            <!-- Machine Meta -->
-            <div class="machine-meta">
-              <div class="meta-row"><span>Reflector:</span> <strong>UKW-B</strong></div>
-              <div class="meta-row"><span>Rings:</span> <strong>A-A-A (01)</strong></div>
-              <div class="meta-row"><span>Steckers:</span> <strong>DE VF ST</strong></div>
-            </div>
+          <div class="asm-registers" id="asm-registers">
+            <span class="reg">RAX: 0x00000041</span>
+            <span class="reg">RBX: 0x00000010</span>
+            <span class="reg">RCX: 0x00000000</span>
+            <span class="reg">RDX: 0x00000020</span>
+            <span class="reg">R12: [ROTOR POS]</span>
+            <span class="reg">FLAGS: [CF=0, ZF=0, SF=0]</span>
           </div>
+          <pre class="asm-code-view" id="asm-code-view">;; Click any key or transmission to watch live assembly execution...</pre>
         </div>
 
         <!-- Lampboard (Glühlampenfeld) -->
         <div class="hardware-block lampboard-block">
-          <span class="block-label">LAMPBOARD (LAMPENFELD)</span>
+          <span class="block-label">ILLUMINATED CASINO LAMPBOARD (GLÜHLAMPENFELD)</span>
           <div class="lampboard" id="lampboard">
-            <!-- Row 1 -->
             <div class="key-row">
               <div class="lamp" data-char="Q">Q</div>
               <div class="lamp" data-char="W">W</div>
@@ -129,7 +195,6 @@
               <div class="lamp" data-char="I">I</div>
               <div class="lamp" data-char="O">O</div>
             </div>
-            <!-- Row 2 -->
             <div class="key-row">
               <div class="lamp" data-char="A">A</div>
               <div class="lamp" data-char="S">S</div>
@@ -140,7 +205,6 @@
               <div class="lamp" data-char="J">J</div>
               <div class="lamp" data-char="K">K</div>
             </div>
-            <!-- Row 3 -->
             <div class="key-row">
               <div class="lamp" data-char="P">P</div>
               <div class="lamp" data-char="Y">Y</div>
@@ -157,7 +221,7 @@
 
         <!-- Keyboard (Tastatur) -->
         <div class="hardware-block keyboard-block">
-          <span class="block-label">KEYBOARD (TASTATUR) - CLICK OR TYPE ON PHYSICAL KEYBOARD</span>
+          <span class="block-label">KEYBOARD (CLICK OR TYPE ANYWHERE)</span>
           <div class="keyboard" id="keyboard">
             <div class="key-row">
               <button class="key" data-char="Q">Q</button>
@@ -215,19 +279,19 @@
         <!-- Batch Studio Translator -->
         <div class="hardware-block studio-block">
           <div class="block-title-row">
-            <span class="block-label">STUDIO DECODER / ENCODER</span>
+            <span class="block-label">UNIVERSAL ENCODER / DECODER (ANY TEXT)</span>
             <div class="studio-actions">
-              <button id="btn-run-studio" class="btn-action">RUN ENIGMA</button>
+              <button id="btn-run-studio" class="btn-action">RUN RECIPROCAL ENIGMA</button>
               <button id="btn-clear-studio" class="btn-ghost">CLEAR</button>
             </div>
           </div>
           <div class="studio-inputs">
             <div class="input-group">
-              <label for="studio-input">Input Ciphertext / Plaintext:</label>
-              <textarea id="studio-input" rows="3" placeholder="Type or paste text here (e.g. 12:50 GXXOJ QSI: RQHB D AIVCWSYR...)"></textarea>
+              <label for="studio-input">Input (Ciphertext or Plaintext):</label>
+              <textarea id="studio-input" rows="3" placeholder="Type or paste any text..."></textarea>
             </div>
             <div class="input-group">
-              <label for="studio-output">Machine Output (Reciprocal):</label>
+              <label for="studio-output">Machine Output (100% Reciprocal):</label>
               <textarea id="studio-output" rows="3" readonly placeholder="Output will appear here..."></textarea>
             </div>
           </div>
@@ -246,7 +310,7 @@
               <span class="plug-tag">S &harr; T</span>
             </div>
             <div class="plug-inputs">
-              <input type="text" id="plug-input-pairs" value="DE VF ST" placeholder="Space separated pairs (e.g. DE VF ST)">
+              <input type="text" id="plug-input-pairs" value="DE VF ST" placeholder="Pairs (e.g. DE VF ST)">
               <button id="btn-update-plugs" class="btn-ghost">UPDATE PLUGS</button>
             </div>
           </div>
@@ -270,7 +334,7 @@
           <input type="text" id="submit-team" name="team" required maxlength="40" value="Lukáš Trkan &amp; Antigravity" class="form-field">
 
           <label class="form-label" for="submit-url">Deployed URL (Public https://)</label>
-          <input type="url" id="submit-url" name="url" required maxlength="200" placeholder="https://lukastrkan.github.io/vibe-enigma" class="form-field">
+          <input type="url" id="submit-url" name="url" required maxlength="200" value="https://lukastrkan.github.io/vibe-enigma/" class="form-field">
 
           <p class="form-note">Must be a public HTTPS URL accessible from the venue screen.</p>
 
@@ -285,7 +349,7 @@
     <!-- Footer -->
     <footer class="footer">
       <div class="footer-left">
-        DevFest Prague 2026 &bull; Vibe Lounge Enigma Challenge &bull; API: <a href="https://devfest-vibe-lounge.web.app/api" target="_blank" rel="noopener">devfest-vibe-lounge.web.app/api</a>
+        DevFest Prague 2026 &bull; Vibe Lounge &bull; API: <a href="https://devfest-vibe-lounge.web.app/api" target="_blank" rel="noopener">devfest-vibe-lounge.web.app/api</a>
       </div>
       <div class="footer-right">
         Pair-coded live with <strong>Gemini</strong> &amp; <strong>Google Antigravity</strong>

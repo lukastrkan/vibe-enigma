@@ -1,4 +1,4 @@
-import { EnigmaMachine } from './enigma.js';
+import { EnigmaMachine, CASINO_SYMBOLS } from './enigma.js';
 import { sound } from './audio.js';
 
 // Configuration
@@ -14,6 +14,7 @@ let machine = new EnigmaMachine({
 let transmissionsData = [];
 let nextSyncSeconds = 10;
 let syncTimerInterval = null;
+let isSpinning = false;
 
 // DOM Elements
 const rotorVals = [
@@ -21,6 +22,17 @@ const rotorVals = [
   document.getElementById('rotor-val-1'),
   document.getElementById('rotor-val-2')
 ];
+const reelSyms = [
+  document.getElementById('reel-sym-0'),
+  document.getElementById('reel-sym-1'),
+  document.getElementById('reel-sym-2')
+];
+const reelStrips = [
+  document.getElementById('reel-strip-0'),
+  document.getElementById('reel-strip-1'),
+  document.getElementById('reel-strip-2')
+];
+
 const lampElements = {};
 document.querySelectorAll('.lamp').forEach(el => {
   lampElements[el.dataset.char] = el;
@@ -54,15 +66,24 @@ const btnOpenSubmit = document.getElementById('btn-open-submit');
 const btnCloseModal = document.getElementById('btn-close-modal');
 const leaderboardForm = document.getElementById('leaderboard-form');
 const submitFeedback = document.getElementById('submit-feedback');
-const submitUrlField = document.getElementById('submit-url');
 
-// Update UI Rotor Display
+// Slot Machine & ASM Elements
+const slotLeverAssembly = document.getElementById('slot-lever-assembly');
+const leverShaft = document.getElementById('lever-shaft');
+const btnSpinSlots = document.getElementById('btn-spin-slots');
+const btnModeCasino = document.getElementById('btn-mode-casino');
+const btnModeAsm = document.getElementById('btn-mode-asm');
+const asmPanel = document.getElementById('asm-panel');
+const asmCodeView = document.getElementById('asm-code-view');
+const asmRegisters = document.getElementById('asm-registers');
+
+// Update UI Rotor & Slot Reel Display
 function updateRotorUI() {
   const currentPos = machine.getPositions();
   for (let i = 0; i < 3; i++) {
-    if (rotorVals[i]) {
-      rotorVals[i].textContent = currentPos[i];
-    }
+    const letter = currentPos[i];
+    if (rotorVals[i]) rotorVals[i].textContent = letter;
+    if (reelSyms[i]) reelSyms[i].textContent = CASINO_SYMBOLS[letter] || '🎰';
   }
 }
 
@@ -73,7 +94,6 @@ function flashLamp(char) {
   const lamp = lampElements[upper];
   if (!lamp) return;
 
-  // Clear any existing lit lamp
   document.querySelectorAll('.lamp.lit').forEach(l => l.classList.remove('lit'));
 
   lamp.classList.add('lit');
@@ -101,20 +121,90 @@ function updateTraceUI(trace) {
   `;
 }
 
+// Update ASM CPU Registers & View
+function updateAsmUI(res) {
+  if (!res || !res.asm) return;
+  const pos = machine.getPositions();
+  const upper = res.input.toUpperCase();
+  const out = res.output;
+
+  asmRegisters.innerHTML = `
+    <span class="reg">RAX: 0x${out.charCodeAt(0).toString(16).padStart(8, '0')}</span>
+    <span class="reg">RBX: 0x00000010</span>
+    <span class="reg">R12: ['${pos[0]}','${pos[1]}','${pos[2]}']</span>
+    <span class="reg">RSI: &amp;'${upper}'</span>
+    <span class="reg">RDI: &amp;'${out}'</span>
+    <span class="reg">FLAGS: [CF=0, ZF=${out === upper ? 1 : 0}, SF=0]</span>
+  `;
+
+  asmCodeView.textContent = res.asm;
+}
+
 // Handle Single Character Keypress
 function handleCharInput(char) {
   const res = machine.processChar(char);
   sound.playKeyClick();
   if (res.stepped) {
-    sound.playRotorStep();
     updateRotorUI();
     flashLamp(res.output);
     updateTraceUI(res.trace);
+    updateAsmUI(res);
   }
   return res.output;
 }
 
-// Parse Agenda String: e.g. "12:50 CRIME LAB: HACK A HUMANOID: BUILD YOUR OWN ROBOT SKILLS IN 100 MINUTES / MARTIN KRCEK"
+// Slot Machine Spin Animation
+async function spinSlotReels(targetPos = null) {
+  if (isSpinning) return;
+  isSpinning = true;
+
+  sound.playLeverPull();
+  leverShaft.classList.add('pulled');
+  setTimeout(() => leverShaft.classList.remove('pulled'), 250);
+
+  // Start spinning all 3 reels
+  reelStrips.forEach(strip => strip.classList.add('spinning'));
+
+  let ticks = 0;
+  const tickInterval = setInterval(() => {
+    sound.playReelTick(0.8 + Math.random() * 0.4);
+    ticks++;
+  }, 70);
+
+  // Stop Reel 1, 2, 3 sequentially
+  const finalPos = targetPos || [
+    String.fromCharCode(65 + Math.floor(Math.random() * 26)),
+    String.fromCharCode(65 + Math.floor(Math.random() * 26)),
+    String.fromCharCode(65 + Math.floor(Math.random() * 26))
+  ].join('');
+
+  setTimeout(() => {
+    reelStrips[0].classList.remove('spinning');
+    sound.playReelStop();
+    rotorVals[0].textContent = finalPos[0];
+    reelSyms[0].textContent = CASINO_SYMBOLS[finalPos[0]] || '🎰';
+  }, 600);
+
+  setTimeout(() => {
+    reelStrips[1].classList.remove('spinning');
+    sound.playReelStop();
+    rotorVals[1].textContent = finalPos[1];
+    reelSyms[1].textContent = CASINO_SYMBOLS[finalPos[1]] || '🎰';
+  }, 950);
+
+  setTimeout(() => {
+    reelStrips[2].classList.remove('spinning');
+    clearInterval(tickInterval);
+    sound.playReelStop();
+    rotorVals[2].textContent = finalPos[2];
+    reelSyms[2].textContent = CASINO_SYMBOLS[finalPos[2]] || '🎰';
+    machine.setPositions(finalPos);
+    isSpinning = false;
+    sound.playJackpot();
+  }, 1300);
+}
+
+// Parse Agenda String
 function parseAgenda(text) {
   const pattern = /^(\d{2}:\d{2})\s+([^:]+):\s+(.+?)(?:\s+\/\s+(.+))?$/;
   const match = text.match(pattern);
@@ -138,7 +228,6 @@ function parseAgenda(text) {
 function renderTransmissions() {
   const filterQuery = (agendaFilter.value || '').toLowerCase().trim();
 
-  // Create temporary decoder instance to not disturb manual state
   const decoder = new EnigmaMachine({
     rotors: machine.rotorNames,
     reflector: machine.reflectorName,
@@ -168,9 +257,9 @@ function renderTransmissions() {
           </div>
           <div class="t-rotors">
             <span>Rotor start:</span>
-            <span class="rotor-chip">${t.start[0]}</span>
-            <span class="rotor-chip">${t.start[1]}</span>
-            <span class="rotor-chip">${t.start[2]}</span>
+            <span class="rotor-chip">${t.start[0]} ${CASINO_SYMBOLS[t.start[0]] || ''}</span>
+            <span class="rotor-chip">${t.start[1]} ${CASINO_SYMBOLS[t.start[1]] || ''}</span>
+            <span class="rotor-chip">${t.start[2]} ${CASINO_SYMBOLS[t.start[2]] || ''}</span>
           </div>
         </div>
 
@@ -185,7 +274,7 @@ function renderTransmissions() {
 
         <div class="t-cipher-raw">
           <code>${t.ciphertext}</code>
-          <button class="btn-load-enigma" data-start="${t.start}" data-cipher="${encodeURIComponent(t.ciphertext)}">Load in Enigma</button>
+          <button class="btn-load-enigma" data-start="${t.start}" data-cipher="${encodeURIComponent(t.ciphertext)}">🎰 Pull &amp; Decode</button>
         </div>
       </div>
     `;
@@ -199,16 +288,21 @@ function renderTransmissions() {
     btn.addEventListener('click', () => {
       const start = btn.dataset.start;
       const cipher = decodeURIComponent(btn.dataset.cipher);
-      machine.setPositions(start);
-      updateRotorUI();
+
+      // Trigger Casino spin to target start setting!
+      spinSlotReels(start);
+
       studioInput.value = cipher;
-      // Auto run in studio
-      const result = machine.processText(cipher, start);
-      studioOutput.value = result.text;
-      if (result.traces.length > 0) {
-        updateTraceUI(result.traces[result.traces.length - 1]);
-      }
-      sound.playKeyClick();
+      setTimeout(() => {
+        const result = machine.processText(cipher, start);
+        studioOutput.value = result.text;
+        if (result.traces.length > 0) {
+          updateTraceUI(result.traces[result.traces.length - 1]);
+        }
+        if (result.asmLogs.length > 0) {
+          asmCodeView.textContent = result.asmLogs[0];
+        }
+      }, 1350);
     });
   });
 }
@@ -250,8 +344,8 @@ setInterval(() => {
   liveClock.textContent = now.toTimeString().split(' ')[0];
 }, 1000);
 
-// Setup Rotor Buttons
-document.querySelectorAll('.rotor-btn').forEach(btn => {
+// Setup Reel Stepper Buttons
+document.querySelectorAll('.reel-step-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     const rotorIdx = parseInt(btn.dataset.rotor, 10);
     const action = btn.dataset.action;
@@ -268,23 +362,43 @@ document.querySelectorAll('.rotor-btn').forEach(btn => {
     const newPos = currentPos.slice(0, rotorIdx) + newChar + currentPos.slice(rotorIdx + 1);
     machine.setPositions(newPos);
     updateRotorUI();
-    sound.playRotorStep();
+    sound.playReelTick(1.0);
   });
 });
 
-// Setup Rotor Presets
+// Setup Presets
 document.querySelectorAll('.btn-preset').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.btn-preset').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     const preset = btn.dataset.preset;
-    machine.setPositions(preset);
-    updateRotorUI();
-    sound.playRotorStep();
+    spinSlotReels(preset);
   });
 });
 
-// Setup Virtual Keyboard
+// Slot Lever Pull Click
+slotLeverAssembly.addEventListener('click', () => {
+  spinSlotReels();
+});
+
+btnSpinSlots.addEventListener('click', () => {
+  spinSlotReels();
+});
+
+// Mode Switcher Tabs
+btnModeCasino.addEventListener('click', () => {
+  btnModeCasino.classList.add('active');
+  btnModeAsm.classList.remove('active');
+  asmPanel.style.display = 'none';
+});
+
+btnModeAsm.addEventListener('click', () => {
+  btnModeAsm.classList.add('active');
+  btnModeCasino.classList.remove('active');
+  asmPanel.style.display = 'flex';
+});
+
+// Virtual Keyboard
 document.querySelectorAll('.key').forEach(keyEl => {
   keyEl.addEventListener('click', () => {
     const char = keyEl.dataset.char;
@@ -296,7 +410,6 @@ document.querySelectorAll('.key').forEach(keyEl => {
 
 // Physical Keyboard Listener
 window.addEventListener('keydown', (e) => {
-  // Ignore if user is typing in textarea or input
   if (['INPUT', 'TEXTAREA'].includes(e.target.tagName)) return;
 
   const key = e.key.toUpperCase();
@@ -330,14 +443,16 @@ agendaFilter.addEventListener('input', () => {
 // Studio Actions
 btnRunStudio.addEventListener('click', () => {
   const input = studioInput.value;
-  const currentPos = machine.getPositions();
   const res = machine.processText(input);
   studioOutput.value = res.text;
   updateRotorUI();
   if (res.traces.length > 0) {
     updateTraceUI(res.traces[res.traces.length - 1]);
   }
-  sound.playKeyClick();
+  if (res.asmLogs.length > 0) {
+    asmCodeView.textContent = res.asmLogs[0];
+  }
+  sound.playJackpot();
 });
 
 btnClearStudio.addEventListener('click', () => {
@@ -361,9 +476,6 @@ btnUpdatePlugs.addEventListener('click', () => {
 // Modal Logic
 btnOpenSubmit.addEventListener('click', () => {
   submitModal.style.display = 'flex';
-  if (window.location.origin && window.location.origin.startsWith('http')) {
-    submitUrlField.value = window.location.href;
-  }
 });
 
 btnCloseModal.addEventListener('click', () => {
